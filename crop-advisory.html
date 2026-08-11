@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Advisory - AgriConnect</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .lucide { width: 24px; height: 24px; }
+        .form-card { background: #FFFFFF; padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
+        .form-card h2 { margin-top: 0; color: #1E293B; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 500; color: #475569; margin-bottom: 8px; }
+        .form-group select, .form-group input { width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; outline: none; transition: border 0.3s; }
+        .form-group select:focus, .form-group input:focus { border-color: #094b65; }
+        .submit-btn { width: 100%; background: #094b65; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: opacity 0.3s; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .submit-btn:hover { opacity: 0.9; }
+        #result:empty { display: none; }
+        #result:not(:empty) { padding: 20px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; margin-top: 20px; color: #1E293B; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+    <div class="dash-wrapper">
+        <!-- Header -->
+        <header class="dash-header">
+            <a href="farmer-dashboard.html" class="dash-logo">🌾 AgriConnect</a>
+            <div class="dash-search" style="position: relative; display: flex; align-items: center;">
+                <i data-lucide="search" style="position: absolute; left: 12px; color: #9CA3AF; width: 18px;"></i>
+                <input type="text" placeholder="Search..." id="searchPlaceholder" style="padding-left: 40px; width: 100%;">
+            </div>
+            <div class="dash-user-controls">
+                <span class="dash-date" id="currentDate"></span>
+                <div class="dash-icons">
+                    <i data-lucide="message-square"></i>
+                    <i data-lucide="bell"></i>
+                </div>
+                <div class="dash-profile">
+                    <img src="https://ui-avatars.com/api/?name=Farmer&background=E8F5E9&color=2E7D32" alt="Profile" id="profileImage">
+                    <div class="dash-profile-info">
+                        <strong id="profileName">Farmer</strong>
+                        <span>Farmer</span>
+                    </div>
+                </div>
+                <a href="index.html" class="dash-create-btn" style="background:#dc3545; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 50%; width: 40px; height: 40px;" title="Logout">
+                    <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+                </a>
+            </div>
+        </header>
+
+        <div class="dash-container" style="padding-top: 50px;">
+            <div class="form-card">
+                <h2><i data-lucide="sprout" style="color: #2E7D32;"></i> Crop Advisory System</h2>
+                <div class="form-group">
+                    <label>Select your crop to get fertilizer & pesticide recommendations</label>
+                    <select id="cropSelect">
+                        <option value="">Choose Crop...</option>
+                        <option value="cotton">Cotton</option>
+                        <option value="soybean">Soybean</option>
+                        <option value="wheat">Wheat</option>
+                    </select>
+                </div>
+                <button class="submit-btn" onclick="showAdvice()"><i data-lucide="file-text" style="width:18px;height:18px;"></i> Get Recommendation</button>
+                <div id="result" class="result-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        lucide.createIcons();
+        
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "login.html?role=farmer";
+                return;
+            }
+            
+            let userName = 'Farmer';
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists() && docSnap.data().name) {
+                userName = docSnap.data().name;
+            }
+
+            document.getElementById('profileName').textContent = userName;
+            document.getElementById('profileImage').src = `https://ui-avatars.com/api/?name=${userName}&background=E8F5E9&color=2E7D32`;
+        });
+
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-GB', options);
+    </script>
+</body>
+</html>

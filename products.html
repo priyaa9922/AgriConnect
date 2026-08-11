@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - AgriConnect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Rancho&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="inner-page">
+
+    <header id="header" class="header-solid">
+        <a href="index.html" class="logo">🌾 AgriConnect</a>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html" class="active">Products</a></li>
+            <li><a href="shops.html">Shops</a></li>
+            <li><a href="compare.html">Compare Prices</a></li>
+            <li><a href="crop-calendar.html">Crop Calendar</a></li>
+        </ul>
+    </header>
+
+    <section class="dashboard">
+        <h1>Available Products</h1>
+        <input type="text" id="searchInput" placeholder="Search products..." onkeyup="searchProducts()">
+        <div class="filter-buttons">
+            <button onclick="filterProducts('all')" class="active">All Products</button>
+            <button onclick="filterProducts('fertilizer')">Fertilizers</button>
+            <button onclick="filterProducts('seed')">Seeds</button>
+            <button onclick="filterProducts('pesticide')">Pesticides</button>
+        </div>
+
+        <div class="dashboard-cards">
+            <div class="dashboard-card product fertilizer">
+                <h3>🌱 Urea</h3>
+                <p>Price: ₹270 / Bag</p>
+                <p>Status: Available</p>
+            </div>
+            <div class="dashboard-card product fertilizer">
+                <h3>🌾 DAP</h3>
+                <p>Price: ₹1350 / Bag</p>
+                <p>Status: Available</p>
+            </div>
+            <div class="dashboard-card product fertilizer">
+                <h3>🌿 NPK 10:26:26</h3>
+                <p>Price: ₹1450 / Bag</p>
+                <p>Status: Low Stock</p>
+            </div>
+            <div class="dashboard-card product seed">
+                <h3>🌱 Cotton Seeds</h3>
+                <p>Price: ₹950 / Packet</p>
+                <p>Status: Available</p>
+            </div>
+            <div class="dashboard-card product pesticide">
+                <h3>🧪 Coragen</h3>
+                <p>Price: ₹650 / Bottle</p>
+                <p>Status: Available</p>
+            </div>
+        </div>
+    </section>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Owner Dashboard - AgriConnect</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Professional color scheme overrides */
+        .dash-notif-icon,
+        .dash-info-icon {
+            background: #2E7D32 !important;
+            /* Solid green */
+            color: #FFFFFF !important;
+            /* White */
+        }
+
+        .dash-greeting-image img {
+            max-width: 350px;
+            height: auto;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .lucide {
+            width: 24px;
+            height: 24px;
+        }
+
+        .dash-notif-icon .lucide {
+            width: 20px;
+            height: 20px;
+        }
+
+        .dash-info-icon .lucide {
+            width: 28px;
+            height: 28px;
+        }
+
+        /* Language Modal */
+        #langModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .lang-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .lang-content button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary, #094b65);
+            color: white;
+        }
+
+        .lang-content button:hover {
+            opacity: 0.9;
+        }
+
+        /* Owner specific styles */
+        .owner-form-section {
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+        .owner-form-section h3 {
+            color: #2B3674;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-product-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .add-product-row input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .add-product-row input:focus {
+            border-color: #2E7D32;
+        }
+
+        .add-product-row button {
+            background: #2E7D32;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .add-product-row button:hover {
+            background: #1b5e20;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Language Selection Modal -->
+    <div id="langModal" style="display: none;">
+        <div class="lang-content">
+            <h2>Choose Language / भाषा चुनें</h2>
+            <button onclick="setLanguage('en')">English</button>
+            <button onclick="setLanguage('hi')">हिंदी (Hindi)</button>
+        </div>
+    </div>
+
+    <div class="dash-wrapper">
+        <!-- Header -->
+        <header class="dash-header">
+            <a href="index.html" class="dash-logo" data-en="🌾 AgriConnect" data-hi="🌾 एग्रीकनेक्ट">🌾 AgriConnect</a>
+            <div class="dash-search" style="position: relative; display: flex; align-items: center;">
+                <i data-lucide="search" style="position: absolute; left: 12px; color: #9CA3AF; width: 18px;"></i>
+                <input type="text" placeholder="Search..." id="searchPlaceholder"
+                    style="padding-left: 40px; width: 100%;">
+            </div>
+            <div class="dash-user-controls">
+                <a href="owner-bookings.html"
+                    style="text-decoration: none; color: #4318FF; font-weight: 600; display: flex; align-items: center; gap: 5px; transition: opacity 0.2s;">
+                    <i data-lucide="clipboard-list" style="width: 18px;"></i>
+                    <span data-en="View Bookings" data-hi="बुकिंग देखें">View Bookings</span>
+                </a>
+                <span class="dash-date" id="currentDate"></span>
+                <div class="dash-icons">
+                    <i data-lucide="message-square" id="chatToggleBtn"></i>
+                    <i data-lucide="languages" id="langToggleBtn" style="cursor: pointer;" onclick="document.getElementById('langModal').style.display='flex'" title="Change Language"></i>
+                </div>
+                <div class="dash-profile">
+                    <img src="https://ui-avatars.com/api/?name=Owner&background=2E7D32&color=FFFFFF" alt="Profile"
+                        id="profileImage">
+                    <div class="dash-profile-info">
+                        <strong id="profileName">Owner</strong>
+                        <span data-en="Shop Owner" data-hi="दुकानदार">Shop Owner</span>
+                    </div>
+                </div>
+                <a href="index.html" class="dash-create-btn"
+                    style="background:#dc3545; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 50%; width: 40px; height: 40px;"
+                    title="Logout">
+                    <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+                </a>
+            </div>
+        </header>
+
+        <div class="dash-container" style="padding-top: 90px;">
+            <!-- Top Section -->
+            <div class="dash-top-section">
+                <div class="dash-greeting-card"
+                    style="padding: 40px; min-height: 250px; position: relative; overflow: visible !important;">
+                    <div class="dash-greeting-content"
+                        style="flex: 1; z-index: 2; position: relative; margin-top: -45px;">
+                        <h1 style="font-size: 42px; margin-bottom: 5px;"><span data-en="Hi, " data-hi="नमस्ते, ">Hi,
+                            </span><span id="userNameDisplay">Owner</span>!</h1>
+                        <p style="font-size: 15px; font-style: italic; color: #6B7280;"
+                            data-en="&quot;Manage your store and grow your business.&quot;"
+                            data-hi="&quot;अपने स्टोर का प्रबंधन करें और अपना व्यवसाय बढ़ाएं।&quot;">"Manage your store
+                            and grow your business."</p>
+                    </div>
+
+                    <!-- Vegetables Image at the bottom left -->
+                    <img src="vegeis.png" alt="Vegetables"
+                        style="position: absolute; left: 0; bottom: 0; height: 140px; width: calc(100% - 230px); object-fit: cover; object-position: left bottom; z-index: 0; opacity: 0.9; border-bottom-left-radius: 20px;">
+
+                    <!-- Farmer Image at the bottom right -->
+                    <div class="dash-greeting-image" style="position: absolute; right: -60px; bottom: 0px; z-index: 3;">
+                        <img src="farmer_clipart.png" alt="Farmer" style="max-width: 420px; height: auto;">
+                    </div>
+                </div>
+
+                <div class="dash-notifications">
+                    <div class="dash-notif-header">
+                        <h3 data-en="Notifications" data-hi="सूचनाएं">Notifications</h3>
+                        <a href="#" data-en="See all" data-hi="सभी देखें">See all</a>
+                    </div>
+                    <div class="dash-notif-list">
+                        <div class="dash-notif-item">
+                            <div class="dash-notif-icon"><i data-lucide="shopping-cart"></i></div>
+                            <div class="dash-notif-text" data-en="New booking request from Ramesh."
+                                data-hi="रमेश से नया बुकिंग अनुरोध।">New booking request from Ramesh.</div>
+                        </div>
+                        <div class="dash-notif-item">
+                            <div class="dash-notif-icon"><i data-lucide="alert-triangle"></i></div>
+                            <div class="dash-notif-text" data-en="Low stock alert: Urea fertilizer."
+                                data-hi="कम स्टॉक चेतावनी: यूरिया उर्वरक।">Low stock alert: Urea fertilizer.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Product Section -->
+            <div class="owner-form-section" id="addProduct">
+                <h3 data-en="Add New Product" data-hi="नया उत्पाद जोड़ें"><i data-lucide="plus-circle"></i> Add New
+                    Product</h3>
+                <div class="add-product-row">
+                    <input type="text" id="productName" placeholder="Product Name" data-placeholder-en="Product Name"
+                        data-placeholder-hi="उत्पाद का नाम">
+                    <input type="number" id="productPrice" placeholder="Price (₹)" data-placeholder-en="Price (₹)"
+                        data-placeholder-hi="कीमत (₹)">
+                    <input type="text" id="productStock" placeholder="Stock Quantity"
+                        data-placeholder-en="Stock Quantity" data-placeholder-hi="स्टॉक मात्रा">
+                    <button onclick="addProduct()" data-en="Add Product" data-hi="उत्पाद जोड़ें">Add Product</button>
+                </div>
+            </div>
+
+            <!-- Product List (Inventory) -->
+            <h3 data-en="Your Inventory" data-hi="आपकी इन्वेंटरी"
+                style="color: #2B3674; margin: 30px 0 20px 0; display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="box"></i> Your Inventory
+            </h3>
+            <div id="productList" class="dash-info-cards" style="margin-bottom: 50px;">
+                <!-- Populated by JS -->
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Check Auth and Load User Data
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "login.html?role=owner";
+                return;
+            }
+
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            let userName = 'Owner';
+            let dashboardLang = 'en';
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.name) userName = data.name;
+                if (data.dashboardLang) dashboardLang = data.dashboardLang;
+            }
+
+            document.getElementById('userNameDisplay').textContent = userName;
+            document.getElementById('profileName').textContent = userName;
+            document.getElementById('profileImage').src = `https://ui-avatars.com/api/?name=${userName}&background=2E7D32&color=FFFFFF`;
+
+            if (!docSnap.exists() || !docSnap.data().dashboardLang) {
+                document.getElementById('langModal').style.display = 'flex';
+            } else {
+                applyLanguage(dashboardLang);
+            }
+
+            // Set Date
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-GB', options);
+
+            // Re-render products if possible
+            if (typeof window.displayProducts === 'function') {
+                window.displayProducts();
+            }
+        });
+
+        // Language Handling
+        window.applyLanguage = function(lang) {
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.textContent = el.getAttribute(`data-${lang}`);
+            });
+
+            const searchInput = document.getElementById('searchPlaceholder');
+            if (lang === 'hi') {
+                searchInput.placeholder = "खोजें...";
+            } else {
+                searchInput.placeholder = "Search...";
+            }
+
+            document.querySelectorAll('[data-placeholder-en]').forEach(el => {
+                el.placeholder = el.getAttribute(`data-placeholder-${lang}`);
+            });
+        }
+
+        window.setLanguage = async function(lang) {
+            document.getElementById('langModal').style.display = 'none';
+            applyLanguage(lang);
+            
+            // Save to Firestore
+            if (auth.currentUser) {
+                const docRef = doc(db, "users", auth.currentUser.uid);
+                try {
+                    // Import updateDoc just for this if needed, but setDoc with merge is easier
+                    const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
+                    await setDoc(docRef, { dashboardLang: lang }, { merge: true });
+                } catch(e) {}
+            }
+
+            if (typeof window.displayProducts === 'function') {
+                window.displayProducts();
+            }
+        }
+
+        // Override displayProducts to match new styling
+        window.displayProducts = async function () {
+            let list = document.getElementById("productList");
+            if (!list) return;
+            list.innerHTML = "";
+
+            if (!auth.currentUser) return;
+
+            // Fetch products belonging to THIS owner
+            let products = [];
+            try {
+                const q = query(collection(db, "products"), where("ownerId", "==", auth.currentUser.uid));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((doc) => {
+                    products.push({ id: doc.id, ...doc.data() });
+                });
+            } catch (e) {
+                console.error("Error fetching products:", e);
+            }
+
+            // Get current lang for dynamic rendering
+            let lang = 'en';
+            if (auth.currentUser) {
+                const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+                if (userDoc.exists() && userDoc.data().dashboardLang) {
+                    lang = userDoc.data().dashboardLang;
+                }
+            }
+
+            let priceLabel = lang === 'hi' ? 'कीमत' : 'Price';
+            let stockLabel = lang === 'hi' ? 'स्टॉक' : 'Stock';
+            let editBtn = lang === 'hi' ? 'संपादित करें' : 'Edit';
+            let deleteBtn = lang === 'hi' ? 'हटाएं' : 'Delete';
+
+            products.forEach((product, index) => {
+                let card = document.createElement("div");
+                card.className = "dash-info-card";
+                card.style.cursor = "default";
+
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 10px;">
+                        <h4 style="color:#2B3674; font-size:18px; font-weight:700; margin:0;">${product.name}</h4>
+                        <i data-lucide="package" style="color:#2E7D32;"></i>
+                    </div>
+                    <p style="color:#A3AED0; margin:5px 0;">${priceLabel}: ₹${product.price}</p>
+                    <p style="color:#A3AED0; margin:5px 0; margin-bottom: 15px;">${stockLabel}: ${product.stock}</p>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="editProduct('${product.id}')" style="flex:1; padding:8px; border:none; border-radius:6px; background:#2E7D32; color:#FFFFFF; cursor:pointer;">
+                            <i data-lucide="edit-2" style="width:14px; height:14px; margin-right:4px; vertical-align:middle;"></i>${editBtn}
+                        </button>
+                        <button onclick="deleteProduct('${product.id}')" style="flex:1; padding:8px; border:none; border-radius:6px; background:#FFEBEE; color:#C62828; cursor:pointer;">
+                            <i data-lucide="trash-2" style="width:14px; height:14px; margin-right:4px; vertical-align:middle;"></i>${deleteBtn}
+                        </button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+            lucide.createIcons();
+        };
+    </script>
+    <script type="module" src="chatbot.js"></script>
+</body>
+
+</html>

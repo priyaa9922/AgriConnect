@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Bookings - AgriConnect</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .lucide { width: 24px; height: 24px; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h2 { color: #2B3674; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .page-header p { color: #A3AED0; font-size: 16px; }
+        .booking-card { background: #FFFFFF; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); position: relative; border-left: 4px solid #d97706; margin-bottom: 20px;}
+        .booking-card.approved { border-left-color: #2E7D32; }
+        .booking-header { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
+        .booking-id { font-weight: 700; color: #2B3674; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .booking-status { font-size: 13px; font-weight: 600; padding: 4px 12px; border-radius: 20px; background: #FEF3C7; color: #d97706; }
+        .booking-status.approved { background: #E8F5E9; color: #2E7D32; }
+        .booking-details { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .detail-item { color: #64748b; font-size: 14px; display: flex; flex-direction: column; gap: 4px;}
+        .detail-item strong { color: #1E293B; font-weight: 600;}
+        .approve-btn { background: #2E7D32; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: opacity 0.2s;}
+        .approve-btn:hover { opacity: 0.9; }
+        .empty-state { text-align: center; padding: 50px; background: white; border-radius: 16px; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <div class="dash-wrapper">
+        <!-- Header -->
+        <header class="dash-header">
+            <a href="owner-dashboard.html" class="dash-logo">🌾 AgriConnect</a>
+            <div class="dash-search" style="position: relative; display: flex; align-items: center;">
+                <i data-lucide="search" style="position: absolute; left: 12px; color: #9CA3AF; width: 18px;"></i>
+                <input type="text" placeholder="Search bookings..." id="searchPlaceholder" style="padding-left: 40px; width: 100%;">
+            </div>
+            <div class="dash-user-controls">
+                <span class="dash-date" id="currentDate"></span>
+                <div class="dash-profile">
+                    <img src="https://ui-avatars.com/api/?name=Owner&background=E8F5E9&color=2E7D32" alt="Profile" id="profileImage">
+                    <div class="dash-profile-info">
+                        <strong id="profileName">Owner</strong>
+                        <span>Shop Owner</span>
+                    </div>
+                </div>
+                <a href="index.html" class="dash-create-btn" style="background:#dc3545; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 50%; width: 40px; height: 40px;" title="Logout">
+                    <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+                </a>
+            </div>
+        </header>
+
+        <div class="dash-container" style="padding-top: 40px;">
+            <div class="page-header">
+                <h2><i data-lucide="clipboard-list" style="color: #2E7D32;"></i> Product Bookings</h2>
+                <p>View and manage all incoming farmer reservations.</p>
+            </div>
+
+            <div id="bookingContainer" style="max-width: 800px;">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        lucide.createIcons();
+        
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "login.html?role=owner";
+                return;
+            }
+            
+            let userName = 'Owner';
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists() && docSnap.data().name) {
+                userName = docSnap.data().name;
+            }
+
+            document.getElementById('profileName').textContent = userName;
+            document.getElementById('profileImage').src = `https://ui-avatars.com/api/?name=${userName}&background=E8F5E9&color=2E7D32`;
+            
+            loadBookings();
+        });
+
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-GB', options);
+
+        async function loadBookings() {
+            let container = document.getElementById("bookingContainer");
+            container.innerHTML = "";
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "bookings"));
+                let bookings = [];
+                querySnapshot.forEach((doc) => {
+                    bookings.push({ id: doc.id, ...doc.data() });
+                });
+
+                if(bookings.length > 0){
+                    bookings.forEach(booking => {
+                        let isApproved = booking.status === "Approved";
+                        let cardClass = isApproved ? "booking-card approved" : "booking-card";
+                        let statusClass = isApproved ? "booking-status approved" : "booking-status";
+                        
+                        let buttonHtml = isApproved ? 
+                            `<span style="color: #2E7D32; font-weight: 600; display:flex; align-items:center; gap:5px;"><i data-lucide="check-circle" style="width:18px;"></i> Approved</span>` :
+                            `<button class="approve-btn" onclick="approveBooking('${booking.id}')"><i data-lucide="check"></i> Approve Booking</button>`;
+
+                        container.innerHTML += `
+                        <div class="${cardClass}">
+                            <div class="booking-header">
+                                <div class="booking-id"><i data-lucide="package" style="color: #64748b;"></i> ${booking.bookingId}</div>
+                                <div class="${statusClass}">${booking.status}</div>
+                            </div>
+                            <div class="booking-details">
+                                <div class="detail-item">
+                                    <span>Farmer Name</span>
+                                    <strong>${booking.farmer}</strong>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Product Requested</span>
+                                    <strong>${booking.product}</strong>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Quantity</span>
+                                    <strong>${booking.quantity} Units</strong>
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end;">
+                                ${buttonHtml}
+                            </div>
+                        </div>
+                        `;
+                    });
+                    lucide.createIcons();
+                } else {
+                    container.innerHTML = `
+                    <div class="empty-state">
+                        <i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1; margin-bottom: 15px;"></i>
+                        <h3 style="color: #1e293b; margin-top: 0;">No Bookings Available</h3>
+                        <p>No farmers have placed reservations for products yet.</p>
+                    </div>
+                    `;
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                console.error("Error loading bookings:", e);
+            }
+        }
+
+        window.approveBooking = async function(id){
+            try {
+                await updateDoc(doc(db, "bookings", id), { status: "Approved" });
+                loadBookings();
+            } catch (e) {
+                console.error("Error approving booking:", e);
+                alert("Failed to approve booking.");
+            }
+        }
+    </script>
+</body>
+</html>

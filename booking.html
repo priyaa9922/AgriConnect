@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Product - AgriConnect</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .lucide { width: 24px; height: 24px; }
+        .form-card { background: #FFFFFF; padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
+        .form-card h2 { margin-top: 0; color: #1E293B; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 500; color: #475569; margin-bottom: 8px; }
+        .form-group select, .form-group input { width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; outline: none; transition: border 0.3s; }
+        .form-group select:focus, .form-group input:focus { border-color: #094b65; }
+        .submit-btn { width: 100%; background: #094b65; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: opacity 0.3s; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .submit-btn:hover { opacity: 0.9; }
+        #bookingMessage:empty { display: none; }
+        #bookingMessage:not(:empty) { padding: 20px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; margin-top: 20px; color: #1E293B; }
+        #bookingMessage h3 { color: #2E7D32; margin-top: 0; display: flex; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="dash-wrapper">
+        <!-- Header -->
+        <header class="dash-header">
+            <a href="farmer-dashboard.html" class="dash-logo">🌾 AgriConnect</a>
+            <div class="dash-search" style="position: relative; display: flex; align-items: center;">
+                <i data-lucide="search" style="position: absolute; left: 12px; color: #9CA3AF; width: 18px;"></i>
+                <input type="text" placeholder="Search..." id="searchPlaceholder" style="padding-left: 40px; width: 100%;">
+            </div>
+            <div class="dash-user-controls">
+                <span class="dash-date" id="currentDate"></span>
+                <div class="dash-icons">
+                    <i data-lucide="message-square"></i>
+                    <i data-lucide="bell"></i>
+                </div>
+                <div class="dash-profile">
+                    <img src="https://ui-avatars.com/api/?name=Farmer&background=E8F5E9&color=2E7D32" alt="Profile" id="profileImage">
+                    <div class="dash-profile-info">
+                        <strong id="profileName">Farmer</strong>
+                        <span>Farmer</span>
+                    </div>
+                </div>
+                <a href="index.html" class="dash-create-btn" style="background:#dc3545; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 50%; width: 40px; height: 40px;" title="Logout">
+                    <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+                </a>
+            </div>
+        </header>
+
+        <div class="dash-container" style="padding-top: 50px;">
+            <div class="form-card">
+                <h2><i data-lucide="calendar-check" style="color: #2E7D32;"></i> Product Booking</h2>
+                <div class="form-group">
+                    <label>Farmer Name</label>
+                    <input type="text" id="farmerName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label>Select Product</label>
+                    <select id="productName">
+                        <option value="">Choose product...</option>
+                        <option value="Urea">Urea</option>
+                        <option value="DAP">DAP</option>
+                        <option value="NPK">NPK</option>
+                        <option value="Coragen">Coragen</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" id="quantity" placeholder="e.g. 5">
+                </div>
+                <button class="submit-btn" onclick="bookProduct()"><i data-lucide="check-circle" style="width:18px;height:18px;"></i> Reserve Product</button>
+                <div id="bookingMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        lucide.createIcons();
+        
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "login.html?role=farmer";
+                return;
+            }
+            
+            let userName = 'Farmer';
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists() && docSnap.data().name) {
+                userName = docSnap.data().name;
+            }
+
+            document.getElementById('profileName').textContent = userName;
+            document.getElementById('farmerName').value = userName;
+            document.getElementById('profileImage').src = `https://ui-avatars.com/api/?name=${userName}&background=E8F5E9&color=2E7D32`;
+        });
+
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-GB', options);
+
+        window.bookProduct = async function() {
+            let farmer = document.getElementById("farmerName").value;
+            let product = document.getElementById("productName").value;
+            let quantity = document.getElementById("quantity").value;
+
+            if (farmer === "" || product === "" || quantity === "") {
+                alert("Please fill all fields");
+                return;
+            }
+
+            if (!auth.currentUser) return;
+
+            let bookingId = "AGR" + Math.floor(Math.random()*10000);
+            
+            try {
+                await addDoc(collection(db, "bookings"), {
+                    bookingId,
+                    farmer,
+                    product,
+                    quantity,
+                    status: "Pending",
+                    farmerId: auth.currentUser.uid
+                });
+
+                const msgBox = document.getElementById("bookingMessage");
+                msgBox.innerHTML = `
+                    <h3><i data-lucide="check-circle"></i> Booking Successful</h3>
+                    <p style="margin-bottom: 5px;"><b>Booking ID:</b> ${bookingId}</p>
+                    <p><b>Status:</b> <span style="color: #d97706;">Pending Approval</span></p>
+                    <p style="margin-top: 10px; font-size: 13px; color: #64748b;">You can collect this product from the shop by showing your Booking ID.</p>
+                `;
+                lucide.createIcons({ root: msgBox }); 
+
+                document.getElementById("productName").value = "";
+                document.getElementById("quantity").value = "";
+            } catch (e) {
+                console.error("Error adding booking:", e);
+                alert("Booking failed. Try again.");
+            }
+        }
+    </script>
+</body>
+</html>

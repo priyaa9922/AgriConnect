@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - AgriConnect</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <section class="login-container">
+
+        <div class="login-box">
+
+            <h1>👑 Admin Login</h1>
+
+            <input
+                type="text"
+                id="adminUsername"
+                placeholder="Admin Username">
+
+            <input
+                type="password"
+                id="adminPassword"
+                placeholder="Password">
+
+            <button onclick="adminLogin()">
+                Login
+            </button>
+
+        </div>
+
+    </section>
+
+    <script>
+        function adminLogin() {
+
+            let username =
+                document.getElementById("adminUsername").value;
+
+            let password =
+                document.getElementById("adminPassword").value;
+
+            if(username === "admin" &&
+               password === "admin123")
+            {
+                window.location.href =
+                    "admin-dashboard.html";
+            }
+            else
+            {
+                alert("Invalid Admin Credentials");
+            }
+        }
+    </script>
+
+</body>
+</html>

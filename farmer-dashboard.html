@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Dashboard - AgriConnect</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Professional color scheme overrides */
+        .dash-notif-icon,
+        .dash-info-icon {
+            background: #2E7D32 !important;
+            /* Solid green */
+            color: #FFFFFF !important;
+            /* White */
+        }
+
+        .dash-greeting-image img {
+            max-width: 350px;
+            height: auto;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .lucide {
+            width: 24px;
+            height: 24px;
+        }
+
+        .dash-notif-icon .lucide {
+            width: 20px;
+            height: 20px;
+        }
+
+        .dash-info-icon .lucide {
+            width: 28px;
+            height: 28px;
+        }
+
+        /* Language Modal */
+        #langModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .lang-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .lang-content button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary, #094b65);
+            color: white;
+        }
+
+        .lang-content button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Language Selection Modal -->
+    <div id="langModal" style="display: none;">
+        <div class="lang-content">
+            <h2>Choose Language / भाषा चुनें</h2>
+            <button onclick="setLanguage('en')">English</button>
+            <button onclick="setLanguage('hi')">हिंदी (Hindi)</button>
+        </div>
+    </div>
+
+    <div class="dash-wrapper">
+        <!-- Header -->
+        <header class="dash-header">
+            <a href="index.html" class="dash-logo" data-en="🌾 AgriConnect" data-hi="🌾 एग्रीकनेक्ट">🌾 AgriConnect</a>
+            <div class="dash-search" style="position: relative; display: flex; align-items: center;">
+                <i data-lucide="search" style="position: absolute; left: 12px; color: #9CA3AF; width: 18px;"></i>
+                <input type="text" placeholder="Search..." id="searchPlaceholder"
+                    style="padding-left: 40px; width: 100%;">
+            </div>
+            <div class="dash-user-controls">
+                <span class="dash-date" id="currentDate"></span>
+                <div class="dash-icons">
+                    <i data-lucide="message-square" id="chatToggleBtn"></i>
+                    <i data-lucide="languages" id="langToggleBtn" style="cursor: pointer;" onclick="document.getElementById('langModal').style.display='flex'" title="Change Language"></i>
+                </div>
+                <div class="dash-profile">
+                    <img src="https://ui-avatars.com/api/?name=Farmer&background=2E7D32&color=FFFFFF" alt="Profile"
+                        id="profileImage">
+                    <div class="dash-profile-info">
+                        <strong id="profileName">Farmer</strong>
+                        <span data-en="Farmer" data-hi="किसान">Farmer</span>
+                    </div>
+                </div>
+                <a href="index.html" class="dash-create-btn"
+                    style="background:#dc3545; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 50%; width: 40px; height: 40px;"
+                    title="Logout">
+                    <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+                </a>
+            </div>
+        </header>
+
+        <div class="dash-container" style="padding-top: 50px;">
+            <!-- Top Section -->
+            <div class="dash-top-section">
+                <div class="dash-greeting-card"
+                    style="padding: 40px; min-height: 250px; position: relative; overflow: visible !important;">
+                    <div class="dash-greeting-content"
+                        style="flex: 1; z-index: 2; position: relative; margin-top: -45px;">
+                        <h1 style="font-size: 42px; margin-bottom: 5px;"><span data-en="Hi, " data-hi="नमस्ते, ">Hi,
+                            </span><span id="userNameDisplay">Farmer</span>!</h1>
+                        <p style="font-size: 15px; font-style: italic; color: #6B7280;"
+                            data-en="&quot;Farming is a profession of hope.&quot;"
+                            data-hi="&quot;खेती उम्मीद का पेशा है।&quot;">"Farming is a profession of hope."</p>
+                    </div>
+
+                    <!-- Vegetables Image at the bottom left -->
+                    <img src="vegeis.png" alt="Vegetables"
+                        style="position: absolute; left: 0; bottom: 0; height: 140px; width: calc(100% - 230px); object-fit: cover; object-position: left bottom; z-index: 0; opacity: 0.9; border-bottom-left-radius: 20px;">
+
+                    <!-- Farmer Image at the bottom right -->
+                    <div class="dash-greeting-image" style="position: absolute; right: -60px; bottom: 0px; z-index: 3;">
+                        <img src="farmer_clipart.png" alt="Farmer" style="max-width: 420px; height: auto;">
+                    </div>
+                </div>
+
+                <div class="dash-notifications">
+                    <div class="dash-notif-header">
+                        <h3 data-en="Notifications" data-hi="सूचनाएं">Notifications</h3>
+                        <a href="#" data-en="See all" data-hi="सभी देखें">See all</a>
+                    </div>
+                    <div class="dash-notif-list">
+                        <div class="dash-notif-item">
+                            <div class="dash-notif-icon"><i data-lucide="package"></i></div>
+                            <div class="dash-notif-text" data-en="New fertilizer stock available at Om Krushi Kendra."
+                                data-hi="ओम कृषि केंद्र पर नया उर्वरक स्टॉक उपलब्ध है।">New fertilizer stock available
+                                at Om Krushi Kendra.</div>
+                        </div>
+                        <div class="dash-notif-item">
+                            <div class="dash-notif-icon"><i data-lucide="cloud-rain"></i></div>
+                            <div class="dash-notif-text" data-en="Weather alert: Heavy rain expected tomorrow."
+                                data-hi="मौसम अलर्ट: कल भारी बारिश की उम्मीद है।">Weather alert: Heavy rain expected
+                                tomorrow.</div>
+                        </div>
+                        <div class="dash-notif-item">
+                            <div class="dash-notif-icon"><i data-lucide="sprout"></i></div>
+                            <div class="dash-notif-text" data-en="Check out the new soybean advisory."
+                                data-hi="नई सोयाबीन सलाह देखें।">Check out the new soybean advisory.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Cards -->
+            <div class="dash-info-cards">
+                <!-- Recommended Products -->
+                <a href="products.html" class="dash-info-card">
+                    <div class="dash-info-icon"><i data-lucide="shopping-bag"></i></div>
+                    <p data-en="Recommended Products" data-hi="अनुशंसित उत्पाद">Recommended Products</p>
+                    <h4 data-en="View products suitable for your crops."
+                        data-hi="अपनी फसलों के लिए उपयुक्त उत्पाद देखें।">View products suitable for your crops.</h4>
+                </a>
+
+                <!-- Compare Prices -->
+                <a href="compare.html" class="dash-info-card">
+                    <div class="dash-info-icon"><i data-lucide="indian-rupee"></i></div>
+                    <p data-en="Compare Prices" data-hi="कीमतों की तुलना करें">Compare Prices</p>
+                    <h4 data-en="Find the lowest product prices." data-hi="सबसे कम उत्पाद की कीमतें खोजें।">Find the
+                        lowest product prices.</h4>
+                </a>
+
+                <!-- Crop Advisory -->
+                <a href="crop-advisory.html" class="dash-info-card">
+                    <div class="dash-info-icon"><i data-lucide="book-open"></i></div>
+                    <p data-en="Crop Advisory" data-hi="फसल सलाह">Crop Advisory</p>
+                    <h4 data-en="Get fertilizer & pesticide tips." data-hi="उर्वरक और कीटनाशक युक्तियाँ प्राप्त करें।">
+                        Get fertilizer & pesticide tips.</h4>
+                </a>
+
+                <!-- Nearby Shops -->
+                <a href="shops.html" class="dash-info-card">
+                    <div class="dash-info-icon"><i data-lucide="store"></i></div>
+                    <p data-en="Nearby Shops" data-hi="आसपास की दुकानें">Nearby Shops</p>
+                    <h4 data-en="Explore available Krushi Kendras." data-hi="उपलब्ध कृषि केंद्रों का अन्वेषण करें।">
+                        Explore available Krushi Kendras.</h4>
+                </a>
+
+                <!-- Book Product -->
+                <a href="booking.html" class="dash-info-card">
+                    <div class="dash-info-icon"><i data-lucide="calendar-check"></i></div>
+                    <p data-en="Book Product" data-hi="उत्पाद बुक करें">Book Product</p>
+                    <h4 data-en="Reserve products before visiting." data-hi="जाने से पहले उत्पादों को आरक्षित करें।">
+                        Reserve products before visiting.</h4>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Check Auth and Load User Data
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "login.html?role=farmer";
+                return;
+            }
+
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            let userName = 'Farmer';
+            let dashboardLang = 'en';
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.name) userName = data.name;
+                if (data.dashboardLang) dashboardLang = data.dashboardLang;
+            }
+
+            document.getElementById('userNameDisplay').textContent = userName;
+            document.getElementById('profileName').textContent = userName;
+            document.getElementById('profileImage').src = `https://ui-avatars.com/api/?name=${userName}&background=2E7D32&color=FFFFFF`;
+
+            if (!docSnap.exists() || !docSnap.data().dashboardLang) {
+                document.getElementById('langModal').style.display = 'flex';
+            } else {
+                window.applyLanguage(dashboardLang);
+            }
+
+            // Set Date
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-GB', options);
+        });
+
+        // Language Handling
+        window.applyLanguage = function(lang) {
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.textContent = el.getAttribute(`data-${lang}`);
+            });
+
+            // Handle input placeholders specifically
+            const searchInput = document.getElementById('searchPlaceholder');
+            if (lang === 'hi') {
+                searchInput.placeholder = "खोजें...";
+            } else {
+                searchInput.placeholder = "Search...";
+            }
+        }
+
+        window.setLanguage = async function(lang) {
+            document.getElementById('langModal').style.display = 'none';
+            window.applyLanguage(lang);
+
+            // Save to Firestore
+            if (auth.currentUser) {
+                const docRef = doc(db, "users", auth.currentUser.uid);
+                try {
+                    const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
+                    await setDoc(docRef, { dashboardLang: lang }, { merge: true });
+                } catch(e) {}
+            }
+        }
+    </script>
+    <script type="module" src="chatbot.js"></script>
+</body>
+
+</html>
